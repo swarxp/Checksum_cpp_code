@@ -1,0 +1,61 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+string addBinary(string a, string b) {
+    string result = "";
+    int carry = 0;
+    
+    for (int i = 3; i >= 0; i--) {
+        int sum = (a[i] - '0') + (b[i] - '0') + carry;
+        result = char(sum % 2 + '0') + result;
+        carry = sum / 2;
+    }
+    
+    if (carry) {
+        result = addBinary(result, "0001");
+    }
+    
+    return result;
+}
+
+string onesComplement(string s) {
+    for (char &c : s) {
+        c = (c == '0') ? '1' : '0';
+    }
+    return s;
+}
+
+string calculateChecksum(vector<string> frames) {
+    string sum = "0000";
+    
+    for (string frame : frames) {
+        sum = addBinary(sum, frame);
+    }
+    
+    return onesComplement(sum);
+}
+
+bool verifyChecksum(vector<string> frames, string receivedChecksum) {
+    frames.push_back(receivedChecksum);
+    string sum = calculateChecksum(frames);
+    return sum == "0000";
+}
+
+int main() {
+    vector<string> framesS = {"1100", "1100"};
+    vector<string> framesR = {"1100", "1100"};
+    
+    string checksum = calculateChecksum(framesS);
+    
+    cout << "Calculated Checksum: " << checksum << endl;
+    
+    if (verifyChecksum(framesR, checksum)) {
+        cout << "No error detected in received frames." << endl;
+    } else {
+        cout << "Error detected in received frames." << endl;
+    }
+    
+    return 0;
+}
